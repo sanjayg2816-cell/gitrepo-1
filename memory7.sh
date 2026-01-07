@@ -1,0 +1,2 @@
+uname -a >> os.log
+
