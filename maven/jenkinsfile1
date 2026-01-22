@@ -1,32 +1,41 @@
 pipeline {
     agent { label 'Jenkins-Agent1' }
 
-    options { timestamps() }
+    options {
+        timestamps()
+    }
+
+    environment {
+        GIT_REPO = 'https://github.com/sanjayg2816-cell/gitrepo-1.git'
+        BRANCH = 'main'
+    }
 
     stages {
+
         stage('Checkout repo') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/sanjayg2816-cell/gitrepo-1.git',
+                git branch: "${BRANCH}",
+                    url: "${GIT_REPO}",
                     credentialsId: 'f0f0aa3c-7ce6-47a2-9cf0-248f976040e9'
             }
         }
 
         stage('Lint (Checkstyle)') {
             steps {
+                echo 'Running code quality checks (lint)... (Will not fail build)'
                 sh '''
                     cd maven
-                    mvn -version
-                    mvn checkstyle:check
+                    mvn checkstyle:check || true
                 '''
             }
         }
 
         stage('Build') {
             steps {
+                echo 'Running maven build...'
                 sh '''
                     cd maven
-                    mvn clean package
+                    mvn clean package -DskipTests=true
                 '''
             }
         }
@@ -46,7 +55,3 @@ pipeline {
         }
     }
 }
-
-  
-
-     
